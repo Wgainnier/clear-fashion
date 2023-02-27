@@ -34,6 +34,7 @@ const spanNbBrand = document.querySelector("#nbBrands")
 const selectRecently = document.querySelector("#recently")
 const spanNbrecent = document.querySelector("#nbNewProduct")
 const selectReasonable = document.querySelector("#reasonable")
+const selectSort = document.querySelector("#sort-select")
 
 
 const current_date = Date.now();
@@ -200,6 +201,15 @@ selectShow.addEventListener('change', async (event) => {
   if (reasonable == "Yes") {
     products.result = products.result.filter(product => (product.price <= 50));
   }
+  console.log(selectSort.value)
+  if(selectSort.value == "price-asc")
+  {
+    products.result = products.result.sort((a,b) => a.price - b.price);
+  }
+  if(selectSort.value == "price-desc")
+  {
+    products.result = products.result.sort((a,b) => b.price - a.price);
+  }
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
@@ -216,6 +226,14 @@ selectPage.addEventListener('change', async(event) =>{
   }
   if (reasonable == "Yes") {
     products.result = products.result.filter(product => (product.price <= 50));
+  }
+  if(selectSort.value == "price-asc")
+  {
+    products.result = products.result.sort((a,b) => a.price - b.price);
+  }
+  if(selectSort.value == "price-desc")
+  {
+    products.result = products.result.sort((a,b) => b.price - a.price);
   }
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -234,6 +252,14 @@ selectBrand.addEventListener('change', async (event) => {
   }
   if (reasonable == "Yes") {
     products.result = products.result.filter(product => (product.price <= 50));
+  }
+  if(selectSort.value == "price-asc")
+  {
+    products.result = products.result.sort((a,b) => a.price - b.price);
+  }
+  if(selectSort.value == "price-desc")
+  {
+    products.result = products.result.sort((a,b) => b.price - a.price);
   }
   brands = event.target.value
 
@@ -255,6 +281,14 @@ selectRecently.addEventListener('change', async(event) => {
   if (reasonable == "Yes") {
     products.result = products.result.filter(product => (product.price <= 50));
   }
+  if(selectSort.value == "price-asc")
+  {
+    products.result = products.result.sort((a,b) => a.price - b.price);
+  }
+  if(selectSort.value == "price-desc")
+  {
+    products.result = products.result.sort((a,b) => b.price - a.price);
+  }
   recently = event.target.value
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -272,6 +306,14 @@ selectReasonable.addEventListener('change', async(event) => {
   }
   if (recently == "Yes") {
     products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  if(selectSort.value == "price-asc")
+  {
+    products.result = products.result.sort((a,b) => a.price - b.price);
+  }
+  if(selectSort.value == "price-desc")
+  {
+    products.result = products.result.sort((a,b) => b.price - a.price);
   }
   reasonable = event.target.value
   setCurrentProducts(products);
