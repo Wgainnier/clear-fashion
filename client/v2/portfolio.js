@@ -20,6 +20,8 @@ Search for available brands list
 // current products on the page
 let currentProducts = [];
 let currentPagination = {};
+let recently = ""
+let brands = "";
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -28,8 +30,12 @@ const sectionProducts = document.querySelector('#products');
 const spanNbProducts = document.querySelector('#nbProducts');
 const selectBrand = document.querySelector("#brand-select")
 const spanNbBrand = document.querySelector("#nbBrands")
-const ascReleased = document.querySelector("#sort-select")
+const selectRecently = document.querySelector("#recently")
+const spanNbrecent = document.querySelector("#nbNewProduct")
+const selectReasonable = document.querySelector("#reasonable")
 
+
+const current_date = Date.now();
 /**
  * Set global value
  * @param {Array} result - products to display
@@ -150,6 +156,31 @@ const render = (products, pagination) => {
  * Declaration of all Listeners
  */
 
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const products = await fetchProducts();
+  const brandsname = await fetchBrands();
+  spanNbBrand.innerHTML = brandsname.result.length
+  
+  //count of the number of recent product:
+ 
+  brandsname.result.unshift("all");
+  const brands = Array.from(
+    brandsname.result,
+    value => `<option value="${value}">${value}</option>`
+  ).join('');
+  
+  selectBrand.innerHTML = brands;
+
+  const all_products = await fetchProducts(1, currentPagination.count);
+  spanNbrecent.innerHTML = all_products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60).length;
+  
+
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
 // Feature 0 
 
 /**
@@ -162,26 +193,10 @@ selectShow.addEventListener('change', async (event) => {
   render(currentProducts, currentPagination);
 });
 
-document.addEventListener('DOMContentLoaded', async () => {
-  const products = await fetchProducts();
-  const brandsname = await fetchBrands();
-  spanNbBrand.innerHTML = brandsname.result.length
-
-  brandsname.result.unshift("all");
-  const brands = Array.from(
-    brandsname.result,
-    value => `<option value="${value}">${value}</option>`
-  ).join('');
-  
-  selectBrand.innerHTML = brands;
-  setCurrentProducts(products);
-  render(currentProducts, currentPagination);
-});
-
 //Feature 1 :
 
 selectPage.addEventListener('change', async(event) =>{
-  const products = await await fetchProducts(parseInt(event.target.value));
+  const products = await fetchProducts(parseInt(event.target.value));
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 })
@@ -194,16 +209,34 @@ selectBrand.addEventListener('change', async (event) => {
   if (event.target.value != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
+  if (recently == "Yes") {
+    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  brands = event.target.value
+
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
 
-/*selectBrand.addEventListener('change', async(event) =>{
-  const brand = await fetchBrands(event.target.value);
-  setCurrentProducts(brand);
-  render(currentProducts, currentPagination);
-})*/
 
 // Feature 3 :
+
+selectRecently.addEventListener('change', async(event) => {
+  const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+  console.log(event.target.value)
+  if (event.target.value == "Yes") {
+    products.result = products.result.filter(product => (current_date >= new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  if (brands != "all") {
+    products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  recently = event.target.value
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+// Feature 4
+
+
 
 
