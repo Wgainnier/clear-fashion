@@ -20,8 +20,9 @@ Search for available brands list
 // current products on the page
 let currentProducts = [];
 let currentPagination = {};
-let recently = ""
-let brands = "";
+let recently = "Yes"
+let brands = "all";
+let reasonable = "Yes";
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -188,7 +189,17 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 selectShow.addEventListener('change', async (event) => {
   const products = await fetchProducts(currentPagination.currentPage, parseInt(event.target.value));
+  console.log(recently)
 
+  if (brands != "all") {
+    products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  if (recently == "Yes") {
+    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  if (reasonable == "Yes") {
+    products.result = products.result.filter(product => (product.price <= 50));
+  }
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
@@ -197,6 +208,15 @@ selectShow.addEventListener('change', async (event) => {
 
 selectPage.addEventListener('change', async(event) =>{
   const products = await fetchProducts(parseInt(event.target.value));
+  if (brands != "all") {
+    products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  if (recently == "Yes") {
+    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  if (reasonable == "Yes") {
+    products.result = products.result.filter(product => (product.price <= 50));
+  }
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 })
@@ -212,6 +232,9 @@ selectBrand.addEventListener('change', async (event) => {
   if (recently == "Yes") {
     products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
   }
+  if (reasonable == "Yes") {
+    products.result = products.result.filter(product => (product.price <= 50));
+  }
   brands = event.target.value
 
   setCurrentProducts(products);
@@ -223,12 +246,14 @@ selectBrand.addEventListener('change', async (event) => {
 
 selectRecently.addEventListener('change', async(event) => {
   const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
-  console.log(event.target.value)
   if (event.target.value == "Yes") {
     products.result = products.result.filter(product => (current_date >= new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
   }
   if (brands != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  if (reasonable == "Yes") {
+    products.result = products.result.filter(product => (product.price <= 50));
   }
   recently = event.target.value
   setCurrentProducts(products);
@@ -236,6 +261,26 @@ selectRecently.addEventListener('change', async(event) => {
 });
 
 // Feature 4
+
+selectReasonable.addEventListener('change', async(event) => {
+  const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+  if (event.target.value == "Yes") {
+    products.result = products.result.filter(product => (product.price <= 50));
+  }
+  if (brands != "all") {
+    products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  if (recently == "Yes") {
+    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  reasonable = event.target.value
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+//Feature 5
+
+
 
 
 
