@@ -23,6 +23,8 @@ let currentPagination = {};
 let recently = "Yes"
 let brands = "all";
 let reasonable = "Yes";
+let totalprices = [];
+let totalproduct;
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -35,6 +37,10 @@ const selectRecently = document.querySelector("#recently")
 const spanNbrecent = document.querySelector("#nbNewProduct")
 const selectReasonable = document.querySelector("#reasonable")
 const selectSort = document.querySelector("#sort-select")
+const P50 = document.querySelector("#p50");
+const P90 = document.querySelector("#p90");
+const P95 = document.querySelector("#p95");
+const latestReleaseDate = document.querySelector("#lastdate");
 
 
 const current_date = Date.now();
@@ -163,6 +169,7 @@ const render = (products, pagination) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const products = await fetchProducts();
+  totalproduct = products
   const brandsname = await fetchBrands();
   spanNbBrand.innerHTML = brandsname.result.length
   
@@ -177,8 +184,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   selectBrand.innerHTML = brands;
 
   const all_products = await fetchProducts(1, currentPagination.count);
+  // feature 9
   spanNbrecent.innerHTML = all_products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60).length;
-  
+  //feature 10
+  const totalprices = totalproduct.result.map(product => product.price);
+
+  const last = totalproduct.result.reduce((latestDate, product) => {
+    if (product.released > latestDate) {
+      return product.released;
+    } else {
+      return latestDate;
+    }
+  }, '');
+  console.log(last)
+  latestReleaseDate.innerHTML = last
+
+  P50.innerHTML = Math.round(quantile(totalprices, 0.50)); 
+  P90.innerHTML = Math.round(quantile(totalprices, 0.90)); 
+  P95.innerHTML = Math.round(quantile(totalprices, 0.95)); 
+
 
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -301,6 +325,33 @@ function filtermenu(products,reasonable,recent){
 
   return products.result
 }
+
+const asc = arr => arr.sort((a, b) => a - b);
+
+const sum = arr => arr.reduce((a, b) => a + b, 0);
+
+const mean = arr => sum(arr) / arr.length;
+
+const std = (arr) => {
+    const mu = mean(arr);
+    const diffArr = arr.map(a => (a - mu) ** 2);
+    return Math.sqrt(sum(diffArr) / (arr.length - 1));
+};
+
+const quantile = (arr, q) => {
+  const sorted = asc(arr);
+  const pos = (sorted.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base]);
+  } else {
+      return sorted[base];
+  }
+};
+
+
+
 
 
 
