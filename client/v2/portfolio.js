@@ -294,7 +294,7 @@ selectRecently.addEventListener('change', async(event) => {
   render(currentProducts, currentPagination);
 });
 
-// Feature 4
+// Feature 4 5
 
 selectReasonable.addEventListener('change', async(event) => {
   const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
@@ -307,20 +307,15 @@ selectReasonable.addEventListener('change', async(event) => {
   if (recently == "Yes") {
     products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
   }
-  if(selectSort.value == "price-asc")
-  {
-    products.result = products.result.sort((a,b) => a.price - b.price);
-  }
-  if(selectSort.value == "price-desc")
-  {
-    products.result = products.result.sort((a,b) => b.price - a.price);
-  }
+  
   reasonable = event.target.value
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
 
-//Feature 5
+
+
+
 
 
 
