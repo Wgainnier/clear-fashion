@@ -109,6 +109,7 @@ const renderProducts = products => {
         <span>${product.brand}</span>
         <a href="${product.link}">${product.name}</a>
         <span>${product.price}</span>
+        <span>${product.released}</span>
       </div>
     `;
     })
@@ -195,21 +196,8 @@ selectShow.addEventListener('change', async (event) => {
   if (brands != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
-  if (recently == "Yes") {
-    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
-  }
-  if (reasonable == "Yes") {
-    products.result = products.result.filter(product => (product.price <= 50));
-  }
-  console.log(selectSort.value)
-  if(selectSort.value == "price-asc")
-  {
-    products.result = products.result.sort((a,b) => a.price - b.price);
-  }
-  if(selectSort.value == "price-desc")
-  {
-    products.result = products.result.sort((a,b) => b.price - a.price);
-  }
+  products.result = filtermenu(products,reasonable,recently)
+  products.result = sortmenu(products,selectSort)
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
@@ -221,20 +209,8 @@ selectPage.addEventListener('change', async(event) =>{
   if (brands != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
-  if (recently == "Yes") {
-    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
-  }
-  if (reasonable == "Yes") {
-    products.result = products.result.filter(product => (product.price <= 50));
-  }
-  if(selectSort.value == "price-asc")
-  {
-    products.result = products.result.sort((a,b) => a.price - b.price);
-  }
-  if(selectSort.value == "price-desc")
-  {
-    products.result = products.result.sort((a,b) => b.price - a.price);
-  }
+  products.result = filtermenu(products,reasonable,recently)
+  products.result = sortmenu(products,selectSort)
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 })
@@ -247,20 +223,8 @@ selectBrand.addEventListener('change', async (event) => {
   if (event.target.value != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
-  if (recently == "Yes") {
-    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
-  }
-  if (reasonable == "Yes") {
-    products.result = products.result.filter(product => (product.price <= 50));
-  }
-  if(selectSort.value == "price-asc")
-  {
-    products.result = products.result.sort((a,b) => a.price - b.price);
-  }
-  if(selectSort.value == "price-desc")
-  {
-    products.result = products.result.sort((a,b) => b.price - a.price);
-  }
+  products.result = filtermenu(products,reasonable,recently)
+  products.result = sortmenu(products,selectSort)
   brands = event.target.value
 
   setCurrentProducts(products);
@@ -281,14 +245,7 @@ selectRecently.addEventListener('change', async(event) => {
   if (reasonable == "Yes") {
     products.result = products.result.filter(product => (product.price <= 50));
   }
-  if(selectSort.value == "price-asc")
-  {
-    products.result = products.result.sort((a,b) => a.price - b.price);
-  }
-  if(selectSort.value == "price-desc")
-  {
-    products.result = products.result.sort((a,b) => b.price - a.price);
-  }
+  products.result = sortmenu(products,selectSort)
   recently = event.target.value
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
@@ -307,14 +264,43 @@ selectReasonable.addEventListener('change', async(event) => {
   if (recently == "Yes") {
     products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
   }
+  products.result = sortmenu(products,selectSort)
   
   reasonable = event.target.value
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
 
+function sortmenu(products, selectSort){
+  if(selectSort.value == "price-asc")
+  {
+    products.result = products.result.sort((a,b) => a.price - b.price);
+  }
+  if(selectSort.value == "price-desc")
+  {
+    products.result = products.result.sort((a,b) => b.price - a.price);
+  }
+  if(selectSort.value == "date-asc")
+  {
+    products.result = products.result.sort((a,b) => new Date(b.released) - new Date(a.released))
+  }
+  if(selectSort.value == "date-desc")
+  {
+    products.result = products.result.sort((a,b) => new Date(a.released) - new Date(b.released))
+  }
+  return products.result
+}
 
+function filtermenu(products,reasonable,recent){
+  if (recent == "Yes") {
+    products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
+  }
+  if (reasonable == "Yes") {
+    products.result = products.result.filter(product => (product.price <= 50));
+  }
 
+  return products.result
+}
 
 
 
