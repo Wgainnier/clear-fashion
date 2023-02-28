@@ -351,9 +351,6 @@ selectFavorite.addEventListener('change', async(event) => {
 
 selectSort.addEventListener('change', async(event) => {
   const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
-  if (event.target.value == "Yes") {
-      products.result = sortmenu(products,selectSort)
-    }
   if (brands != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
@@ -364,8 +361,6 @@ selectSort.addEventListener('change', async(event) => {
 }
   products.result = filtermenu(products,reasonable,recently)
   products.result = sortmenu(products,selectSort)
-  
-  selectSort = event.target.value
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
