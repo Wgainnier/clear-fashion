@@ -25,6 +25,10 @@ let brands = "all";
 let reasonable = "Yes";
 let totalprices = [];
 let totalproduct;
+let favoritesList =[];
+let favorite = "No";
+const twoWeeksAgo = new Date();
+twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
 
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
@@ -36,11 +40,12 @@ const spanNbBrand = document.querySelector("#nbBrands")
 const selectRecently = document.querySelector("#recently")
 const spanNbrecent = document.querySelector("#nbNewProduct")
 const selectReasonable = document.querySelector("#reasonable")
-const selectSort = document.querySelector("#sort-select")
+let selectSort = document.querySelector("#sort-select")
 const P50 = document.querySelector("#p50");
 const P90 = document.querySelector("#p90");
 const P95 = document.querySelector("#p95");
 const latestReleaseDate = document.querySelector("#lastdate");
+const selectFavorite = document.querySelector("#favorite-select")
 
 
 const current_date = Date.now();
@@ -116,6 +121,7 @@ const renderProducts = products => {
         <a href="${product.link}">${product.name}</a>
         <span>${product.price}</span>
         <span>${product.released}</span>
+        <button onclick="addToFavorites('${product.uuid}')">Add to Favorites</button>
       </div>
     `;
     })
@@ -169,7 +175,7 @@ const render = (products, pagination) => {
 
 document.addEventListener('DOMContentLoaded', async () => {
   const products = await fetchProducts();
-  totalproduct = products
+  totalproduct = await fetchProducts(1, 48);
   const brandsname = await fetchBrands();
   spanNbBrand.innerHTML = brandsname.result.length
   
@@ -182,11 +188,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   ).join('');
   
   selectBrand.innerHTML = brands;
-
-  const all_products = await fetchProducts(1, currentPagination.count);
   // feature 9
-  spanNbrecent.innerHTML = all_products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60).length;
-  //feature 10
+
+  
+
+const productsReleasedWithinTwoWeeks = totalproduct.result.filter(product => {
+  const releaseDate = new Date(product.releaseDate);
+  return releaseDate >= twoWeeksAgo;
+});
+
+  spanNbrecent.innerHTML = productsReleasedWithinTwoWeeks.length;
+  
   const totalprices = totalproduct.result.map(product => product.price);
 
   const last = totalproduct.result.reduce((latestDate, product) => {
@@ -196,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return latestDate;
     }
   }, '');
-  console.log(last)
+  
   latestReleaseDate.innerHTML = last
 
   P50.innerHTML = Math.round(quantile(totalprices, 0.50)); 
@@ -215,11 +227,14 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 selectShow.addEventListener('change', async (event) => {
   const products = await fetchProducts(currentPagination.currentPage, parseInt(event.target.value));
-  console.log(recently)
-
   if (brands != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
+  if (favorite == "Yes") {
+    products.result = products.result.filter(product => {
+      return favoritesList.includes(product.uuid);
+    });
+}
   products.result = filtermenu(products,reasonable,recently)
   products.result = sortmenu(products,selectSort)
   setCurrentProducts(products);
@@ -233,6 +248,11 @@ selectPage.addEventListener('change', async(event) =>{
   if (brands != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
+  if (favorite == "Yes") {
+    products.result = products.result.filter(product => {
+      return favoritesList.includes(product.uuid);
+    });
+}
   products.result = filtermenu(products,reasonable,recently)
   products.result = sortmenu(products,selectSort)
   setCurrentProducts(products);
@@ -247,6 +267,11 @@ selectBrand.addEventListener('change', async (event) => {
   if (event.target.value != "all") {
     products.result = products.result.filter(product => product.brand == event.target.value);
   }
+  if (favorite == "Yes") {
+    products.result = products.result.filter(product => {
+      return favoritesList.includes(product.uuid);
+    });
+}
   products.result = filtermenu(products,reasonable,recently)
   products.result = sortmenu(products,selectSort)
   brands = event.target.value
@@ -269,6 +294,11 @@ selectRecently.addEventListener('change', async(event) => {
   if (reasonable == "Yes") {
     products.result = products.result.filter(product => (product.price <= 50));
   }
+  if (favorite == "Yes") {
+    products.result = products.result.filter(product => {
+      return favoritesList.includes(product.uuid);
+    });
+}
   products.result = sortmenu(products,selectSort)
   recently = event.target.value
   setCurrentProducts(products);
@@ -288,9 +318,54 @@ selectReasonable.addEventListener('change', async(event) => {
   if (recently == "Yes") {
     products.result = products.result.filter(product => (current_date - new Date(product.released)) / (1000 * 60 * 60 * 24) <= 60);
   }
+  if (favorite == "Yes") {
+      products.result = products.result.filter(product => {
+        return favoritesList.includes(product.uuid);
+      });
+  }
   products.result = sortmenu(products,selectSort)
   
   reasonable = event.target.value
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+selectFavorite.addEventListener('change', async(event) => {
+  const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+  if (event.target.value == "Yes") {
+      products.result = products.result.filter(product => {
+        return favoritesList.includes(product.uuid);
+      });
+    }
+  if (brands != "all") {
+    products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  products.result = filtermenu(products,reasonable,recently)
+  products.result = sortmenu(products,selectSort)
+  
+  favorite = event.target.value
+  setCurrentProducts(products);
+  render(currentProducts, currentPagination);
+});
+
+
+selectSort.addEventListener('change', async(event) => {
+  const products = await fetchProducts(currentPagination.currentPage, currentPagination.pageSize);
+  if (event.target.value == "Yes") {
+      products.result = sortmenu(products,selectSort)
+    }
+  if (brands != "all") {
+    products.result = products.result.filter(product => product.brand == event.target.value);
+  }
+  if (favorite == "Yes") {
+    products.result = products.result.filter(product => {
+      return favoritesList.includes(product.uuid);
+    });
+}
+  products.result = filtermenu(products,reasonable,recently)
+  products.result = sortmenu(products,selectSort)
+  
+  selectSort = event.target.value
   setCurrentProducts(products);
   render(currentProducts, currentPagination);
 });
@@ -324,6 +399,12 @@ function filtermenu(products,reasonable,recent){
   }
 
   return products.result
+}
+
+function addToFavorites(product) {
+  
+  favoritesList.push(product);
+  
 }
 
 const asc = arr => arr.sort((a, b) => a - b);
