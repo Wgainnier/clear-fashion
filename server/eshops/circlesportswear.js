@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
-const marque = 'DedicatedBrand';
+const marque =  "CircleSportsWear"
 /**
  * Parse webpage e-shop
  * @param  {String} data - html response
@@ -8,20 +8,21 @@ const marque = 'DedicatedBrand';
  */
 const parse = data => {
   const $ = cheerio.load(data);
-
-  return $('.productList-container .productList')
+  return $('.grid__item')
     .map((i, element) => {
-      const name = $(element)
-        .find('.productList-title')
+      let name = $(element)
+        .find('.card__heading')
         .text()
         .trim()
         .replace(/\s/g, ' ');
+        name = name.slice(0, 50);
+        name = name.trim()
       const price = parseInt(
         $(element)
-          .find('.productList-price')
+          .find('.money')
           .text()
+          .slice(1)
       );
-
       return {name, price, marque};
     })
     .get();
@@ -34,7 +35,6 @@ const parse = data => {
  */
 module.exports.scrape = async url => {
   try {
-    
     const response = await fetch(url);
 
     if (response.ok) {
