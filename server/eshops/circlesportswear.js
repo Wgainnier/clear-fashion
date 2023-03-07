@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const cheerio = require('cheerio');
 const marque =  "CircleSportsWear"
+const datescraped = new Date()
 /**
  * Parse webpage e-shop
  * @param  {String} data - html response
@@ -23,7 +24,7 @@ const parse = data => {
           .text()
           .slice(1)
       );
-      return {name, price, marque};
+      return {name, price, marque,datescraped};
     })
     .get();
 };

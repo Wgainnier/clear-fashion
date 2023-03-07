@@ -386,34 +386,46 @@ const COTELE_PARIS = [
 // 🎯 TODO 1: New released products
 // // 1. Log if we have new products only (true or false)
 // // A new product is a product `released` less than 2 weeks.
-const isAllNewProducts = marketplace.every(marketplace => {
-  const daysSinceRelease = (new Date() - new Date(marketplace.released)) / (1000 * 60 * 60 * 24);
-  return daysSinceRelease < 14;
+const twoWeeksAgo = new Date();
+twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+const newProducts = COTELE_PARIS.filter(product => {
+  const releaseDate = new Date(product.released);
+  return releaseDate >= twoWeeksAgo;
   });
-  
-  console.log(isAllNewProducts);
+  console.log(newProducts);
+
 
 // 🎯 TODO 2: Reasonable price
 // // 1. Log if coteleparis is a reasonable price shop (true or false)
 // // A reasonable price if all the products are less than 100€
 // TODO 2: Reasonable price
 
+let reasonablePrice = true;
 
-
+for (let i = 0; i < COTELE_PARIS.length; i++) {
+  if (COTELE_PARIS[i].price > 100) {
+    reasonablePrice = false;
+    break;
+  }
+}
+console.log(reasonablePrice);
 // 🎯 TODO 3: Find a specific product
 // 1. Find the product with the uuid `2b9a47e3-ed73-52f6-8b91-379e9c8e526c`
 // 2. Log the product
 const targetUuid = "2b9a47e3-ed73-52f6-8b91-379e9c8e526c";
-const targetProduct = COTELE_PARIS.products.find(product => product.uuid === targetUuid);
-if (targetProduct) {
-  console.log(targetProduct);
-} else {
-  console.log(`Product with UUID ${targetUuid} not found`);
-}
+const product = COTELE_PARIS.find(item => item.uuid === '2b9a47e3-ed73-52f6-8b91-379e9c8e526c');
+console.log(product);
 
 // 🎯 TODO 4: Delete a specific product
 // 1. Delete the product with the uuid `2b9a47e3-ed73-52f6-8b91-379e9c8e526c`
 // 2. Log the new list of product
+
+const index = COTELE_PARIS.findIndex(product => product.uuid === '2b9a47e3-ed73-52f6-8b91-379e9c8e526c');
+  // Delete the product at the found index
+  COTELE_PARIS.splice(index, 1);
+  console.log("done")
+  console.log(COTELE_PARIS);
 
 // 🎯 TODO 5: Save the favorite product
 // We declare and assign a variable called `blueJacket`
@@ -436,7 +448,12 @@ let jacket = blueJacket;
 jacket.favorite = true;
 
 // 1. Log `blueJacket` and `jacket` variables
+console.log('blueJacket:', blueJacket);
+console.log('jacket:', jacket);
 // 2. What do you notice?
+// a new favorite property was added and set to true for the jacket item
+//but blue jacket didn't change because of the spread operator
+
 
 // we make a new assignment again
 blueJacket = {
@@ -452,7 +469,10 @@ blueJacket = {
 };
 
 // 3. Update `jacket` property with `favorite` to true WITHOUT changing blueJacket properties
-
+jacket = {
+  ...blueJacket,  // spread operator to copy all properties from blueJacket
+  favorite: true  // add the favorite property with a value of true
+};
 /**
  * 🎬
  * The End: last thing to do
@@ -462,3 +482,8 @@ blueJacket = {
 // 🎯 LAST TODO: Save in localStorage
 // 1. Save MY_FAVORITE_BRANDS in the localStorage
 // 2. log the localStorage
+
+localStorage.setItem('MY_FAVORITE_BRANDS', JSON.stringify(MY_FAVORITE_BRANDS));
+
+const storage = JSON.parse(localStorage.getItem('MY_FAVORITE_BRANDS'));
+console.log(storage);
