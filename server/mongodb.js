@@ -120,19 +120,15 @@ async function sortdate(){
   }
 }
 
-const twoWeeksAgo = new Date();
-twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
 async function sortdate2weeks(){
   await client.connect()
 try{
-  const products = await collection.find({ datescraped: { $gt: twoWeeksAgo } }).toArray();
+  const products = await collection.find({ datescraped: {$lt: new Date(new Date() - 7 * 60 * 60 * 24 * 1000)} }).toArray();
   console.log(products)
 }
 finally{
   await client.close()
-  console.log("Finish 5 print items scraped earlier than 2 weeks ago \n")
-  console.log(twoWeeksAgo)
+  console.log("Finish 5 print items scraped between today and 2 weeks ago \n")
   process.exit()
 }
 }
@@ -141,11 +137,11 @@ finally{
 
 async function start(){
   await insert()
-  //await find_brand()
-  //await lessprice()
-  //await sortpriceasc()
-  //await sortpricedesc()
-  //await sortdate()
+  await find_brand()
+  await lessprice()
+  await sortpriceasc()
+  await sortpricedesc()
+  await sortdate()
   await sortdate2weeks()
 }
 
