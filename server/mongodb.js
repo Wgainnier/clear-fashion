@@ -10,7 +10,9 @@ function getProducts() {
           name: product.name,
           price: product.price,
           marque: product.marque,
-          datescraped: product.datescraped
+          datescraped: product.datescraped,
+          link: product.link,
+          photo: product.photo
         };
       });
       return products;
