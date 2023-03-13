@@ -23,8 +23,13 @@ const parse = data => {
           .find('.price')
           .text()
       );
-
-      return {name, price, marque, datescraped};
+      let link= $(element)
+      .find('.product-miniature__thumb-link')
+      .attr("href")
+      let photo = $(element)
+      .find('img')
+      .attr('data-full-size-image-url')
+      return {name, price, marque,datescraped, link, photo};
     })
     .get();
 };

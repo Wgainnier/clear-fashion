@@ -22,8 +22,13 @@ const parse = data => {
           .find('.productList-price')
           .text()
       );
-
-      return {name, price, marque,datescraped};
+      let link= $(element)
+      .find('.productList-link')
+      .attr("href")
+      let photo = $(element)
+      .find('img')
+      .attr('data-src')
+      return {name, price, marque,datescraped, link, photo};
     })
     .get();
 };
