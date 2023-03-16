@@ -8,13 +8,18 @@ let a = [];
 async function sandbox () {
   try {
     console.log(`🕵️‍♀️  browsing Montlimart circlesportswear and dedicatedbrand eshop`);
-
-    products = await dedicatedbrand.scrape('https://www.dedicatedbrand.com/en/men/news');
-    a = await montlimart.scrape('https://www.montlimart.com/101-t-shirts');
+    for (page = 1; page <= 2; page++) {
+      a = await dedicatedbrand.scrape('https://www.dedicatedbrand.com/en/men/news?p=${page}');
+      products = products.concat(a)
+    }
+    for (page = 1; page <= 2; page++) {
+      a = await montlimart.scrape('https://www.montlimart.com/101-t-shirts?p=${page}');
+      products = products.concat(a)
+    }
+    for (page = 1; page <= 2; page++) {
+    a = await circlesportswear.scrape('https://shop.circlesportswear.com/collections/t-shirts-homme?p=${page}') 
     products = products.concat(a)
-    a = await circlesportswear.scrape('https://shop.circlesportswear.com/collections/t-shirts-homme') 
-    products = products.concat(a)
-
+    }
     console.log(products);
     console.log('done');
     Savefunc(products);
