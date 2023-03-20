@@ -34,7 +34,11 @@ async function find_brand(productId){
 
     return result;
   }
-
+  app.get("/products/:id", async(req,res)=>{
+    const prod = await find_brand(req.params.id);
+    await client.close()
+    res.send(prod)
+  },
   app.get('/products/search', async (req, res) => { 
   await client.connect()
   const marque = req.query.brand || undefined;
@@ -50,13 +54,9 @@ async function find_brand(productId){
   const result = await collection.find(search).limit(limit).toArray();
   
   res.json(result);
-});
+})
 
-app.get("/products/:id", async(req,res)=>{
-  const prod = await find_brand(req.params.id);
-  await client.close()
-  res.send(prod)
-}
+
 );
 
 
