@@ -1,3 +1,12 @@
+# What was done :
+
+All the TD's were done and all works.
+
+Except the last TD in which the vercel works 
+but the client version doesn't return the products on the
+webpage but it returns the products in console of the WebPage.
+
+
 # 👕 Clear Fashion
 
 > What's the story behind each item of clothing you buy?
