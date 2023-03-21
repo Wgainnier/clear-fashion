@@ -6,6 +6,7 @@ Except the last TD in which the vercel works
 but the client version doesn't return the products on the
 webpage but it returns the products in console of the WebPage.
 
+the link of my vercel which returns products : https://server-alpha-one.vercel.app/products/search
 
 # 👕 Clear Fashion
 
